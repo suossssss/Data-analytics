@@ -1,0 +1,62 @@
+# -*- coding: utf-8 -*-
+
+################################
+### Connects to Database
+### Gets Data from Database
+################################
+
+import sqlite3 as lite
+import sys
+import os 
+
+con = None
+
+## Creates a folder for the database
+## Set directory to YOUR computer and folder
+directoryForDB = "/Users/suoliyun/Desktop/" + "pittsburghData.db"
+
+con = lite.connect(directoryForDB)
+##########################################
+#### Output: Neighborhood, (pop2010 - pop1940) as difference: ORDER by difference DESC
+##########################################
+with con:
+	print"                 " ##blank line 
+	cur = con.cursor()    
+	cur.execute("SELECT Neighborhood ,(pop2010-pop1940)as newcol FROM popANDdensity  ORDER BY (pop2010-pop1940) DESC")
+	rows = cur.fetchall()
+	for row in rows:
+	    print""" '%s',%d"""% ( row[0],row[1])
+
+##########################################
+#### Output: Neighborhood, pop2010, Information
+##########################################
+with con:
+	print"                 " ##blank line 
+	cur = con.cursor()    
+	cur.execute("SELECT p.Neighborhood,p.pop2010,e.jobInformation FROM popANDdensity p,employment e where p.Neighborhood=e.Neighborhood")
+	rows = cur.fetchall()
+	for row in rows:
+	    print"""'%s',%d,%f"""%( row[0],row[1], row[2])
+		
+##########################################
+#### Output: Neighborhood, MAX(pop2010)
+##########################################
+with con:
+        print"                 " ##blank line 
+	cur = con.cursor()    
+	cur.execute("SELECT Neighborhood,pop2010 FROM popANDdensity WHERE pop2010=(SELECT MAX(pop2010)FROM popANDdensity)")
+	rows = cur.fetchall()
+	for row in rows:
+            print""" '%s',%d"""% ( row[0],row[1])
+		
+		
+##########################################
+#### Output: Neighborhood, MAX(pop2010), Scientific
+##########################################
+with con:
+	print"                 " ##blank line 
+	cur = con.cursor()    
+	cur.execute("SELECT p.Neighborhood,p.pop2010,e.jobScientific FROM popANDdensity p,employment e WHERE p.Neighborhood=e.Neighborhood AND pop2010=(SELECT MAX(pop2010)FROM popANDdensity)" )
+	rows = cur.fetchall()
+	for row in rows:
+	    print"""'%s',%d,%f"""%( row[0],row[1], row[2])
