@@ -1,0 +1,35 @@
+library(ggplot2)
+library(scales)
+library(reshape2)
+library(plyr)
+
+train=read.csv("/Users/suoliyun/Documents/train.csv")
+head(train)
+#whisker
+Whisker<-ggplot(train,aes(factor(Pclass),Fare))
+Whisker+geom_boxplot(aes(fill=factor(Pclass)))
+
+#histogram
+Histogram<-ggplot(train,aes(factor(Pclass)))
+Histogram+geom_histogram(aes(fill=..count..),binwidth =1)
+
+#facet grid
+FacetGrid<-ggplot(train,aes(Survived,Age,color=factor(Survived)))+geom_point()
+FacetGrid+facet_grid(Pclass~Sex)
+
+#violin
+Violin<-ggplot(train,aes(factor(Pclass),Survived))
+Violin+geom_violin()
+
+#heatmap
+train<-train[sample(nrow(train),100),]
+train<-train[,-1]
+train$Name <- with(train, reorder(Name, Survived)) 
+train.m <-melt(train)
+train.m<- ddply(train.m, .(variable), transform, rescale = rescale(value))
+p <- ggplot(train.m, aes(variable, Name)) + geom_tile(aes(fill = rescale), colour = "steelblue") + scale_fill_gradient(low = "white", high = "steelblue")
+base_size<-10
+p + theme_grey(base_size = base_size) + labs(x = "", y = "") + scale_x_discrete(expand = c(0, 0)) +
+  scale_y_discrete(expand = c(0, 0)) + 
+  theme(legend.position = "none", axis.ticks = element_blank(), axis.text.x = element_text(size = base_size *0.8, angle = 330, hjust = 0, colour = "grey50"))
+
